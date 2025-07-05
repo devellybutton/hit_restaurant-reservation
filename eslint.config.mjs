@@ -38,4 +38,15 @@ export default tseslint.config(
       ],
     },
   },
+  {
+    files: ['**/swagger.ts', '**/swagger.config.ts', '**/swagger-setup.ts'],
+    rules: {
+      // Swagger 설정 파일에서는 unsafe 규칙 비활성화
+      '@typescript-eslint/no-unsafe-assignment': 'off',
+      '@typescript-eslint/no-unsafe-call': 'off',
+      '@typescript-eslint/no-unsafe-member-access': 'off',
+      '@typescript-eslint/no-unsafe-return': 'off',
+      '@typescript-eslint/no-unsafe-argument': 'off',
+    },
+  },
 );
