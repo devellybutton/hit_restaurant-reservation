@@ -9,7 +9,13 @@ import { ReservationModule } from './reservation/reservation.module';
 import { RestaurantModule } from './restaurant/restaurant.module';
 
 @Module({
-  imports: [AuthModule, CustomerModule, MenuModule, ReservationModule, RestaurantModule],
+  imports: [
+    AuthModule,
+    CustomerModule,
+    MenuModule,
+    ReservationModule,
+    RestaurantModule,
+  ],
   controllers: [AppController, MenuController],
   providers: [AppService],
 })
