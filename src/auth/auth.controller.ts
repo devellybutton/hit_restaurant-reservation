@@ -1,32 +1,31 @@
-import { Controller } from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { CustomerLoginForm, RestaurantLoginForm } from './forms';
+import { LoginResponseDto } from './dtos';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  // @Post()
-  // create(@Body() createAuthDto: CreateAuthDto) {
-  //   return this.authService.create(createAuthDto);
-  // }
+  /**
+   * 고객 로그인
+   * @param loginForm 고객 로그인 입력 정보
+   * @returns JWT 토큰 정보
+   */
+  @Post('customer/login')
+  @HttpCode(HttpStatus.OK)
+  async customerLogin(@Body() loginForm: CustomerLoginForm): Promise<LoginResponseDto> {
+    return await this.authService.customerLogin(loginForm);
+  }
 
-  // @Get()
-  // findAll() {
-  //   return this.authService.findAll();
-  // }
-
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.authService.findOne(+id);
-  // }
-
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateAuthDto: UpdateAuthDto) {
-  //   return this.authService.update(+id, updateAuthDto);
-  // }
-
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.authService.remove(+id);
-  // }
+  /**
+   * 식당 로그인
+   * @param loginForm 식당 로그인 입력 정보
+   * @returns JWT 토큰 정보
+   */
+  @Post('restaurant/login')
+  @HttpCode(HttpStatus.OK)
+  async restaurantLogin(@Body() loginForm: RestaurantLoginForm): Promise<LoginResponseDto> {
+    return await this.authService.restaurantLogin(loginForm);
+  }
 }
