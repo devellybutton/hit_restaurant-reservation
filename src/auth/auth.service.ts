@@ -3,11 +3,12 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Customer } from 'src/entity/customer.entity';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 import { Restaurant } from './../entity/restaurant.entity';
 import { CustomerLoginForm, RestaurantLoginForm } from './forms';
 import { JwtPayload, LoginResponseDto } from './dtos';
 import * as bcrypt from 'bcrypt';
+import { UserType } from './enums';
 
 /**
  * 인증 서비스
@@ -31,22 +32,12 @@ export class AuthService {
    * @throws {UnauthorizedException} 로그인 실패 시 (존재하지 않는 계정, 비밀번호 불일치)
    */
   async customerLogin(loginForm: CustomerLoginForm): Promise<LoginResponseDto> {
-    const { loginId, password } = loginForm;
-    const customer = await this.customerRepository.findOne({
-      where: { loginId },
-    });
-
-    if (!customer) throw new UnauthorizedException('고객 계정이 아닙니다.');
-
-    const isPasswordValid = await bcrypt.compare(password, customer.password);
-
-    if (!isPasswordValid) throw new UnauthorizedException('비밀번호가 일치하지 않습니다.');
-
-    return this.generateAccessToken({
-      id: customer.id,
-      loginId: customer.loginId,
-      type: 'customer',
-    });
+    return this.validateAndLogin(
+      this.customerRepository,
+      loginForm,
+      UserType.CUS,
+      '고객 계정이 아닙니다.',
+    );
   }
 
   /**
@@ -56,21 +47,32 @@ export class AuthService {
    * @throws {UnauthorizedException} 로그인 실패 시 (존재하지 않는 계정, 비밀번호 불일치)
    */
   async restaurantLogin(loginForm: RestaurantLoginForm): Promise<LoginResponseDto> {
-    const { loginId, password } = loginForm;
-    const restaurant = await this.restaurantRepository.findOne({
-      where: { loginId },
+    return this.validateAndLogin(
+      this.restaurantRepository,
+      loginForm,
+      UserType.RES,
+      '식당 계정이 아닙니다.',
+    );
+  }
+
+  private async validateAndLogin<T extends { id: number; loginId: string; password: string }>(
+    repository: Repository<T>,
+    loginForm: { loginId: string; password: string },
+    type: UserType,
+    notFoundMessage: string,
+  ): Promise<LoginResponseDto> {
+    const user = await repository.findOne({
+      where: { loginId: loginForm.loginId } as FindOptionsWhere<T>,
     });
+    if (!user) throw new UnauthorizedException(notFoundMessage);
 
-    if (!restaurant) throw new UnauthorizedException('식당 계정이 아닙니다.');
-
-    const isPasswordValid = await bcrypt.compare(password, restaurant.password);
-
+    const isPasswordValid = await bcrypt.compare(loginForm.password, user.password);
     if (!isPasswordValid) throw new UnauthorizedException('비밀번호가 일치하지 않습니다.');
 
     return this.generateAccessToken({
-      id: restaurant.id,
-      loginId: restaurant.loginId,
-      type: 'customer',
+      id: user.id,
+      loginId: user.loginId,
+      type,
     });
   }
 
