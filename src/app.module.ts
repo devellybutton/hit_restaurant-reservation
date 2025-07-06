@@ -7,9 +7,22 @@ import { MenuController } from './menu/menu.controller';
 import { MenuModule } from './menu/menu.module';
 import { ReservationModule } from './reservation/reservation.module';
 import { RestaurantModule } from './restaurant/restaurant.module';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { getTypeOrmConfig } from './util/typeorm';
+import { envValidationSchema } from './util/env.config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: process.env.NODE_ENV === 'development' ? '.env.prod' : '.env.dev',
+      validationSchema: envValidationSchema,
+    }),
+    TypeOrmModule.forRootAsync({
+      useFactory: (configService: ConfigService) => getTypeOrmConfig(configService),
+      inject: [ConfigService],
+    }),
     AuthModule,
     CustomerModule,
     MenuModule,

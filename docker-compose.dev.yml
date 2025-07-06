@@ -1,0 +1,19 @@
+# 개발환경: MySQL 도커라이징
+services:
+  mysql:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: dev1234
+      MYSQL_DATABASE: restaurant_dev
+    ports:
+      - '3307:3306'
+    volumes:
+      - mysql_dev_data:/var/lib/mysql
+    networks:
+      - restaurant-net
+
+volumes:
+  mysql_dev_data:
+
+networks:
+  restaurant-net:

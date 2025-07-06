@@ -1,0 +1,33 @@
+# 운영환경: NestJS + MySQL 도커라이징
+services:
+  mysql:
+    image: mysql:5.7
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: prod1234
+      MYSQL_DATABASE: restaurant_prod
+    volumes:
+      - mysql_prod_data:/var/lib/mysql
+    networks:
+      - restaurant-net
+
+  nestjs:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: nestjs-app
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    env_file:
+      - .env.prod
+    depends_on:
+      - mysql
+    networks:
+      - restaurant-net
+
+volumes:
+  mysql_prod_data:
+
+networks:
+  restaurant-net:
