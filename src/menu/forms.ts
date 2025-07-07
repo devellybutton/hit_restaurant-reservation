@@ -14,7 +14,7 @@ export class CreateMenuForm extends BaseMenuFields {}
  * 메뉴 목록 조회 필터용 폼 DTO
  */
 export class MenuFilterForm {
-  @ApiPropertyOptional({ description: '메뉴 이름', example: '김치볶음밥' })
+  @ApiPropertyOptional({ description: '메뉴 이름', example: '치즈 돈카츠 정식' })
   @IsOptional()
   @IsString()
   name?: string;

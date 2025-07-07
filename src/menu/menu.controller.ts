@@ -52,7 +52,7 @@ export class MenuController {
     name: 'name',
     required: false,
     description: '메뉴 이름 부분 검색',
-    example: '김치',
+    example: '돈카츠',
   })
   @ApiQuery({
     name: 'minPrice',
