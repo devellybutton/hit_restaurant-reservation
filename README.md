@@ -1,98 +1,112 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 프로젝트 개요
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+- **배포 Swagger 주소**: [첨부예정]
+  - 호스팅: 25. 07. 07 ~ 25. 07. 19)
+- **기술 스택**: NestJS, MySQL, TypeORM, AWS EC2
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+# 사전 요구사항
 
-## Description
+- <b>Node.js</b>: 18.x 이상
+- <b>npm</b>: 최신 버전
+- <b>MySQL</b>: 8.0 이상 `(로컬 실행 시)` 또는 Docker `(도커 실행 시)`
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+---
 
-## Project setup
+# 로컬 실행 가이드
 
-```bash
-$ npm install
-```
+## 1. MySQL을 로컬 DB로 실행
 
-## Compile and run the project
+### 1) 사전 준비
+
+- 로컬에 MySQL이 설치되어 있어야 하며, 기본 포트는 `3306`입니다.
+
+### 2) MySQL 접속
+
+- 터미널의 MySQL의 루트 계정으로 접속합니다.
+- 비밀번호가 없는 경우 그냥 Enter를 입력합니다.
+
+#### **Windows**
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+cd "C:\Program Files\MySQL\MySQL Server 8.0\bin"
+mysql -u root -p -P 3306 -h 127.0.0.1
 ```
 
-## Run tests
+#### **macOS**
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+mysql -u root -p -P 3306 -h 127.0.0.1
 ```
 
-## Deployment
+### 3) 계정 및 DB 생성
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+```sql
+-- 사용자 생성
+CREATE USER 'dev_user'@'localhost' IDENTIFIED BY 'dev1234';
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+-- DB 생성
+CREATE DATABASE restaurant_dev DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- 권한 부여
+GRANT ALL PRIVILEGES ON restaurant_dev.* TO 'dev_user'@'localhost';
+FLUSH PRIVILEGES;
+```
+
+### 4) NestJS 서버 실행
+
+`.env.dev` 파일을 프로젝트 경로 최상단에 넣습니다.
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+npm install
+npm run start:dev
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## 2. MySQL을 도커로 실행
 
-## Resources
+### 1) 환경 설정
 
-Check out a few resources that may come in handy when working with NestJS:
+- `.env.dev` 파일을 프로젝트 경로 최상단에 넣습니다.
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+### 2) 도커 컨테이너 실행
 
-## Support
+도커 데몬을 먼저 실행한 후, 터미널에 아래 명령어를 입력합니다.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```bash
+# MySQL 컨테이너 실행
+npm run docker:dev:up
+```
 
-## Stay in touch
+### 3) NestJS 서버 실행
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+터미널에 아래 명령어를 입력합니다.
 
-## License
+```bash
+# 의존성 설치 (최초 실행 시)
+npm install
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+# NestJS 서버 실행
+npm run start:dev
+```
+
+### 4) 도커 컨테이너 종료
+
+```bash
+# MySQL 컨테이너 종료
+npm run docker:dev:down
+```
+
+---
+
+# 접속 확인
+
+서버가 정상적으로 실행되면 다음 주소에서 확인할 수 있습니다:
+
+- <b>로컬 서버</b>: `http://localhost:3000`
+  - <b> Health Check API</b>: `http://localhost:3000/api`
+- <b>Swagger 문서</b>: `http://localhost:3000/api-docs`
+
+# 문제 해결 가이드
+
+- <b>포트 충돌</b>: 3000번 포트가 이미 사용 중인 경우, 다른 포트로 변경하거나 해당 프로세스를 종료하세요
+- <b>MySQL 연결 오류</b>: 데이터베이스 연결 정보가 .env.dev 파일과 일치하는지 확인하세요
+- <b>Docker 오류</b>: Docker Desktop이 실행 중인지 확인하고, 도커 컨테이너 상태를 확인하세요

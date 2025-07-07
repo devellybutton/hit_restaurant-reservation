@@ -6,7 +6,7 @@ services:
       MYSQL_ROOT_PASSWORD: dev1234
       MYSQL_DATABASE: restaurant_dev
     ports:
-      - '3307:3306'
+      - '3306:3306'
     volumes:
       - mysql_dev_data:/var/lib/mysql
     networks:
