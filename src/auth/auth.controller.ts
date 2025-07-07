@@ -16,9 +16,22 @@ export class AuthController {
 
   /**
    * 고객 회원가입
+   * @param loginForm 고객 회원가입 입력 정보
+   * @returns 가입된 회원 정보
    */
   @Post('customer/signup')
   @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: '회원가입 (고객용)', description: '고객 계정으로 회원가입한다.' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        loginId: { type: 'string', example: 'customer01' },
+        password: { type: 'string', example: 'Password123' },
+      },
+      required: ['loginId', 'password'],
+    },
+  })
   async customerSignup(@Body() body: { loginId: string; password: string }) {
     const newCustomer = await this.authService.createCustomer(body);
     return ResponseUtil.success(newCustomer, '고객 회원가입 완료');
@@ -26,9 +39,22 @@ export class AuthController {
 
   /**
    * 식당 회원가입
+   * @param loginForm 식당 회원가입 입력 정보
+   * @returns 가입된 식당 정보
    */
   @Post('restaurant/signup')
   @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: '회원가입 (식당용)', description: '식당 계정으로 회원가입한다.' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        loginId: { type: 'string', example: 'restaurant01' },
+        password: { type: 'string', example: 'Password123' },
+      },
+      required: ['loginId', 'password'],
+    },
+  })
   async restaurantSignup(@Body() body: { loginId: string; password: string }) {
     const newRestaurant = await this.authService.createRestaurant(body);
     return ResponseUtil.success(newRestaurant, '식당 회원가입 완료');
@@ -41,7 +67,7 @@ export class AuthController {
    */
   @Post('customer/login')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: '고객 로그인', description: '고객 계정으로 로그인한다.' })
+  @ApiOperation({ summary: '로그인 (고객용)', description: '고객 계정으로 로그인한다.' })
   @ApiBody({ type: CustomerLoginForm })
   @ApiResponse({ status: 200, description: '로그인 성공', type: SuccessResponseDto })
   @ApiResponse({
@@ -63,7 +89,7 @@ export class AuthController {
    */
   @Post('restaurant/login')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: '식당 로그인', description: '식당 계정으로 로그인한다.' })
+  @ApiOperation({ summary: '로그인 (식당용)', description: '식당 계정으로 로그인한다.' })
   @ApiBody({ type: RestaurantLoginForm })
   @ApiResponse({ status: 200, description: '로그인 성공', type: LoginResponseDto })
   @ApiResponse({

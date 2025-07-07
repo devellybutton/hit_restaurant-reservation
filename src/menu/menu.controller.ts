@@ -45,7 +45,7 @@ export class MenuController {
    */
   @Get()
   @ApiOperation({
-    summary: '메뉴 목록 조회',
+    summary: '메뉴 목록 조회 (식당용)',
     description: '로그인한 식당의 메뉴 목록을 조회한다. 이름, 가격, 카테고리로 필터링할 수 있다.',
   })
   @ApiQuery({
@@ -92,7 +92,7 @@ export class MenuController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
-    summary: '메뉴 추가',
+    summary: '메뉴 추가 (식당용)',
     description: '새로운 메뉴를 추가한다. 식당 권한이 필요하다.',
   })
   @ApiResponse({ status: 201, description: '메뉴 추가 성공', type: SuccessResponseDto })
@@ -112,7 +112,7 @@ export class MenuController {
    */
   @Delete(':id')
   @ApiOperation({
-    summary: '메뉴 삭제',
+    summary: '메뉴 삭제 (식당용)',
     description: '메뉴를 삭제한다. 본인 식당의 메뉴만 삭제 가능하다.',
   })
   @ApiParam({

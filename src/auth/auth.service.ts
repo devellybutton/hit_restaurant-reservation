@@ -37,7 +37,9 @@ export class AuthService {
       password: hashedPassword,
     });
 
-    return await this.customerRepository.save(newCustomer);
+    const savedCustomer = await this.customerRepository.save(newCustomer);
+
+    return { id: savedCustomer.id, loginId: savedCustomer.loginId };
   }
 
   /**
@@ -51,7 +53,9 @@ export class AuthService {
       password: hashedPassword,
     });
 
-    return await this.restaurantRepository.save(newRestaurant);
+    const savedRestaurant = await this.restaurantRepository.save(newRestaurant);
+
+    return { id: savedRestaurant.id, loginId: savedRestaurant.loginId };
   }
 
   /**
