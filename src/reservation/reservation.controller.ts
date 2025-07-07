@@ -37,7 +37,7 @@ import {
  * 고객의 예약 CRUD 및 식당의 예약 조회 기능 제공
  */
 @ApiTags('Reservation')
-@ApiBearerAuth()
+@ApiBearerAuth('access-token')
 @Controller('reservations')
 export class ReservationController {
   constructor(private readonly reservationService: ReservationService) {}
@@ -60,8 +60,9 @@ export class ReservationController {
   async createReservation(
     @Request() req: { user: JwtPayload },
     @Body() createForm: CreateReservationForm,
-  ): Promise<ReservationResponseDto> {
-    return await this.reservationService.createReservation(req.user, createForm);
+  ): Promise<SuccessResponseDto<ReservationResponseDto>> {
+    const result = await this.reservationService.createReservation(req.user, createForm);
+    return ResponseUtil.created(result, RESPONSE_MESSAGES.RESERVATION_CREATED);
   }
 
   /**
@@ -104,8 +105,9 @@ export class ReservationController {
   async getCustomerReservations(
     @Request() req: { user: JwtPayload },
     @Query() filters: ReservationFilterForm,
-  ): Promise<ReservationResponseDto[]> {
-    return await this.reservationService.getReservations(req.user, filters);
+  ): Promise<SuccessResponseDto<ReservationResponseDto[]>> {
+    const result = await this.reservationService.getReservations(req.user, filters);
+    return ResponseUtil.created(result, RESPONSE_MESSAGES.RESERVATION_LIST_RETRIEVED);
   }
 
   /**
@@ -150,7 +152,7 @@ export class ReservationController {
     @Query() filters: ReservationFilterForm,
   ): Promise<SuccessResponseDto<ReservationResponseDto[]>> {
     const result = await this.reservationService.getReservations(req.user, filters);
-    return ResponseUtil.created(result, RESPONSE_MESSAGES.RESERVATION_CREATED);
+    return ResponseUtil.created(result, RESPONSE_MESSAGES.RESERVATION_LIST_RETRIEVED);
   }
 
   /**

@@ -15,6 +15,26 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   /**
+   * 고객 회원가입
+   */
+  @Post('customer/signup')
+  @HttpCode(HttpStatus.CREATED)
+  async customerSignup(@Body() body: { loginId: string; password: string }) {
+    const newCustomer = await this.authService.createCustomer(body);
+    return ResponseUtil.success(newCustomer, '고객 회원가입 완료');
+  }
+
+  /**
+   * 식당 회원가입
+   */
+  @Post('restaurant/signup')
+  @HttpCode(HttpStatus.CREATED)
+  async restaurantSignup(@Body() body: { loginId: string; password: string }) {
+    const newRestaurant = await this.authService.createRestaurant(body);
+    return ResponseUtil.success(newRestaurant, '식당 회원가입 완료');
+  }
+
+  /**
    * 고객 로그인
    * @param loginForm 고객 로그인 입력 정보
    * @returns JWT 토큰 정보

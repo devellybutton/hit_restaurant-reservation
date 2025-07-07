@@ -3,6 +3,7 @@ import {
   ForbiddenException,
   NotFoundException,
   ConflictException,
+  BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { JwtPayload } from 'src/auth/dtos';
@@ -51,6 +52,26 @@ export class ReservationService {
       this.findRestaurantById(createForm.restaurantId),
       this.findMenusByIds(createForm.menuIds, createForm.restaurantId),
     ]);
+
+    // 시간 유효성 검증
+    const now = new Date();
+    if (startTime <= now) {
+      throw new BadRequestException(RESPONSE_MESSAGES.RESERVATION_START_IN_FUTURE);
+    }
+
+    if (endTime <= startTime) {
+      throw new BadRequestException(RESPONSE_MESSAGES.RESERVATION_END_AFTER_START);
+    }
+
+    const durationMinutes = (endTime.getTime() - startTime.getTime()) / 1000 / 60;
+
+    if (durationMinutes < 30) {
+      throw new BadRequestException(RESPONSE_MESSAGES.RESERVATION_MIN_DURATION);
+    }
+
+    if (durationMinutes > 240) {
+      throw new BadRequestException(RESPONSE_MESSAGES.RESERVATION_MAX_DURATION);
+    }
 
     // 시간 겹침 검증
     await this.validateTimeConflict(createForm.restaurantId, startTime, endTime);

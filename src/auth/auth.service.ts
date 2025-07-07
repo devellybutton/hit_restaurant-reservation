@@ -27,6 +27,34 @@ export class AuthService {
   ) {}
 
   /**
+   * 새 고객 생성
+   */
+  async createCustomer(customerData: { loginId: string; password: string }) {
+    const hashedPassword = await this.hashPassword(customerData.password);
+
+    const newCustomer = this.customerRepository.create({
+      loginId: customerData.loginId,
+      password: hashedPassword,
+    });
+
+    return await this.customerRepository.save(newCustomer);
+  }
+
+  /**
+   * 새 식당 생성
+   */
+  async createRestaurant(restaurantData: { loginId: string; password: string }) {
+    const hashedPassword = await this.hashPassword(restaurantData.password);
+
+    const newRestaurant = this.restaurantRepository.create({
+      loginId: restaurantData.loginId,
+      password: hashedPassword,
+    });
+
+    return await this.restaurantRepository.save(newRestaurant);
+  }
+
+  /**
    * 고객 로그인
    * @param loginForm - 고객 계정 로그인 입력 정보 (아이디, 비밀번호)
    * @returns JWT 액세스 토큰
@@ -74,7 +102,7 @@ export class AuthService {
    */
   private generateAccessToken(payload: JwtPayload): LoginResponseDto {
     const accessToken = this.jwtService.sign(payload);
-    const expiresIn = this.configService.get<string>('JWT_EXPIRES_IN') ?? '2h';
+    const expiresIn = this.configService.get<string>('JWT_EXPIRES_IN') ?? '3h';
 
     return {
       accessToken,

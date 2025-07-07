@@ -125,11 +125,11 @@ export const RESPONSE_MESSAGES = {
   MENU_LIST_RETRIEVED: '메뉴 목록 조회가 완료되었습니다.',
 
   // 메뉴 관련 (실패)
-  MENU_NOT_FOUND: '메뉴를 찾을 수 없습니다.',
+  MENU_NOT_FOUND: '해당 메뉴를 찾을 수 없습니다.',
   MENU_FORBIDDEN: '본인 식당의 메뉴만 삭제할 수 있습니다.',
 
   // 식당 관련 (실패)
-  RESTAURANT_NOT_FOUND: '메뉴를 찾을 수 없습니다.',
+  RESTAURANT_NOT_FOUND: '해당 식당을 찾을 수 없습니다.',
 
   // 고객 관련 (실패)
   CUSTOMER_NOT_FOUND: '고객 정보를 찾을 수 없습니다.',

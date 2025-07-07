@@ -34,7 +34,7 @@ import {
 } from 'src/util/responses';
 
 @ApiTags('Menu')
-@ApiBearerAuth()
+@ApiBearerAuth('access-token')
 @UseGuards(RestaurantAuthGuard)
 @Controller('menus')
 export class MenuController {

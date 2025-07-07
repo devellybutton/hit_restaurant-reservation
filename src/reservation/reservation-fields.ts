@@ -16,7 +16,7 @@ import {
  * 전화번호 필드용 데코레이터
  *
  * - Swagger 문서에 전화번호 설명 및 예시 추가
- * - 010으로 시작하는 11자리 숫자 형식 검증 (`/^010\d{8}$/`)
+ * - 9~11자리 숫자 형식 검증
  * - 필수 여부에 따라 `@IsNotEmpty` 또는 `@IsOptional` 적용
  *
  * @param required 해당 필드가 필수인지 여부 (기본값: true)
@@ -29,8 +29,8 @@ export function PhoneDecorator(required = true) {
       : ApiPropertyOptional({ description: '전화번호', example: '01012345678' }),
     IsString(),
     required ? IsNotEmpty() : IsOptional(),
-    Matches(/^010\d{8}$/, {
-      message: '전화번호는 010으로 시작하는 11자리 숫자여야 합니다.',
+    Matches(/^\d{9,11}$/, {
+      message: '전화번호는 9~11자리 숫자여야 합니다.',
     }),
   );
 }
@@ -50,9 +50,9 @@ export function GuestCountDecorator(required = true) {
     required
       ? ApiProperty({ description: '예약 인원수', example: 4, minimum: 1 })
       : ApiPropertyOptional({ description: '예약 인원수', example: 4, minimum: 1 }),
-    IsNumber(),
-    Min(1),
-    required ? IsNotEmpty() : IsOptional(),
+    IsNumber({}, { message: '예약 인원수는 숫자여야 합니다.' }),
+    Min(1, { message: '예약 인원수는 최소 1명 이상이어야 합니다.' }),
+    required ? IsNotEmpty({ message: '예약 인원수는 필수 입력입니다.' }) : IsOptional(),
   );
 }
 
@@ -78,10 +78,10 @@ export function MenuIdsDecorator(required = true) {
           example: [1, 2],
           type: [Number],
         }),
-    IsArray(),
+    IsArray({ message: '메뉴 ID는 배열이어야 합니다.' }),
     ArrayMinSize(1, { message: '최소 1개의 메뉴를 선택해야 합니다.' }),
-    IsNumber({}, { each: true }),
-    required ? IsNotEmpty() : IsOptional(),
+    IsNumber({}, { each: true, message: '모든 메뉴 ID는 숫자여야 합니다.' }),
+    required ? IsNotEmpty({ message: '메뉴 ID 목록은 필수 입력입니다.' }) : IsOptional(),
   );
 }
 
@@ -101,7 +101,10 @@ export function DateFieldDecorator(name: string, required = true) {
     required
       ? ApiProperty({ description: `${name} (ISO 8601)`, example: '2025-07-07T10:00:00Z' })
       : ApiPropertyOptional({ description: `${name} (ISO 8601)`, example: '2025-07-07T10:00:00Z' }),
-    IsDateString(),
-    required ? IsNotEmpty() : IsOptional(),
+    IsDateString(
+      {},
+      { message: `${name}은(는) ISO 8601 형식의 날짜여야 합니다. (시간: 00:00~23:59)` },
+    ),
+    required ? IsNotEmpty({ message: `${name}은(는) 필수 입력입니다.` }) : IsOptional(),
   );
 }

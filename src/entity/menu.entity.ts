@@ -35,7 +35,7 @@ export class Menu {
   name: string;
 
   /** 메뉴 가격 */
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column({ type: 'int', unsigned: true })
   price: number;
 
   /** 메뉴 카테고리 (양식, 일식, 중식) */

@@ -90,6 +90,24 @@ export class IsValidPriceConstraint implements ValidatorConstraintInterface {
 }
 
 /**
+ * 둘 다 입력된 경우, 최소가격이 최대가격보다 작아야 됨
+ */
+@ValidatorConstraint({ name: 'minLessThanMax', async: false })
+export class MinLessThanMaxConstraint implements ValidatorConstraintInterface {
+  validate(_: any, args: ValidationArguments): boolean {
+    const obj = args.object as any;
+    if (typeof obj.minPrice === 'number' && typeof obj.maxPrice === 'number') {
+      return obj.minPrice <= obj.maxPrice;
+    }
+    return true; // 둘 다 없거나 하나만 있을 경우는 검증 통과
+  }
+
+  defaultMessage(): string {
+    return '최소 가격은 최대 가격보다 작거나 같아야 합니다.';
+  }
+}
+
+/**
  * 인원수 검증 (1명 이상)
  */
 @ValidatorConstraint({ name: 'isValidGuestCount', async: false })

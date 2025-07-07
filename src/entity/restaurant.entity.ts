@@ -21,7 +21,7 @@ export class Restaurant {
   id: number;
 
   /** 식당 이름 */
-  @Column({ length: 200 })
+  @Column({ length: 200, nullable: true })
   name: string;
 
   /** 로그인 ID */
@@ -33,7 +33,7 @@ export class Restaurant {
   password: string;
 
   /** 식당 전화번호 */
-  @Column({ length: 20 })
+  @Column({ length: 20, nullable: true })
   phone: string;
 
   /** 해당 식당의 메뉴 목록 */

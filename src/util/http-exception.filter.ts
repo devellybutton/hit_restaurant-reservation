@@ -10,7 +10,7 @@ import { ResponseUtil } from 'src/util/responses';
  * @param exception - 발생한 예외 객체
  * @param host - 현재 처리 중인 요청의 ArgumentsHost
  */
-@Catch()
+@Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost): void {
     const ctx = host.switchToHttp();
@@ -29,7 +29,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       } else if (typeof response === 'object' && response !== null) {
         const obj = response as any;
         message = obj.message ?? message;
-        error = obj.error ?? error;
+        error = obj.error ?? HttpStatus[status];
       }
     }
 

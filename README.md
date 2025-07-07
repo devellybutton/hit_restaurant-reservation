@@ -1,8 +1,8 @@
 # 프로젝트 개요
 
 - **배포 Swagger 주소**: [첨부예정]
-  - 호스팅: 25. 07. 07 ~ 25. 07. 19)
-- **기술 스택**: NestJS, MySQL, TypeORM, AWS EC2
+  - 호스팅: 25. 07. 07 ~ 25. 07. 19
+- **기술 스택**: NestJS, MySQL, TypeORM, AWS Lightsail
 
 # 사전 요구사항
 

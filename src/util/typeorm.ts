@@ -18,7 +18,7 @@ export const getTypeOrmConfig = (configService: ConfigService): TypeOrmModuleOpt
     migrations: [join(__dirname, '..', 'database', 'migrations', '*.{ts,js}')],
     migrationsTableName: 'migrations',
     synchronize: get<boolean>('TYPEORM_SYNCHRONIZE'),
-    logging: isLocal,
+    logging: false,
     charset: 'utf8mb4',
   };
 };

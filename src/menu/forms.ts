@@ -1,8 +1,9 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiHideProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsOptional, IsString, IsNumber, Min, IsEnum } from 'class-validator';
+import { IsOptional, IsString, IsNumber, Min, IsEnum, Validate } from 'class-validator';
 import { MenuCategory } from './enums';
 import { BaseMenuFields, ApiMenuCategory } from './menu-fields';
+import { MinLessThanMaxConstraint } from 'src/util/valider';
 
 /**
  * 메뉴 생성 요청 폼 DTO
@@ -13,7 +14,7 @@ export class CreateMenuForm extends BaseMenuFields {}
  * 메뉴 목록 조회 필터용 폼 DTO
  */
 export class MenuFilterForm {
-  @ApiPropertyOptional({ description: '메뉴 이름', example: '김치' })
+  @ApiPropertyOptional({ description: '메뉴 이름', example: '김치볶음밥' })
   @IsOptional()
   @IsString()
   name?: string;
@@ -36,4 +37,9 @@ export class MenuFilterForm {
   @IsOptional()
   @IsEnum(MenuCategory)
   category?: MenuCategory;
+
+  // validtion용 더미
+  @ApiHideProperty()
+  @Validate(MinLessThanMaxConstraint)
+  priceRangeCheck?: any;
 }

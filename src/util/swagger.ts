@@ -30,11 +30,6 @@ export const setupSwagger = (app: INestApplication): void => {
       },
       'access-token',
     )
-    .addTag('Auth')
-    .addTag('Restaurant')
-    .addTag('Menu')
-    .addTag('Reservation')
-    .addTag('Customer')
     .build();
 
   const document: OpenAPIObject = SwaggerModule.createDocument(app, config);

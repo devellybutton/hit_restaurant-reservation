@@ -60,7 +60,7 @@ export class ReservationFilterForm {
     example: '2025-07-07',
   })
   @IsOptional()
-  @IsDateString()
+  @IsDateString({}, { message: '유효한 ISO 8601 날짜 형식이어야 합니다.' })
   date?: string;
 
   @ApiPropertyOptional({
