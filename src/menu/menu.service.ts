@@ -6,6 +6,7 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import { CreateMenuForm, MenuFilterForm } from './forms';
 import { JwtPayload } from 'src/auth/dtos';
 import { MenuResponseDto } from './dtos';
+import { RESPONSE_MESSAGES } from 'src/util/responses';
 
 @Injectable()
 export class MenuService {
@@ -45,7 +46,7 @@ export class MenuService {
     });
 
     if (!restaurant) {
-      throw new NotFoundException('식당 정보를 찾을 수 없습니다.');
+      throw new NotFoundException(RESPONSE_MESSAGES.RESTAURANT_NOT_FOUND);
     }
 
     const menu = this.menuRepository.create({
@@ -75,11 +76,11 @@ export class MenuService {
     });
 
     if (!menu) {
-      throw new NotFoundException('메뉴를 찾을 수 없습니다.');
+      throw new NotFoundException(RESPONSE_MESSAGES.MENU_NOT_FOUND);
     }
 
     if (menu.restaurant.id !== user.id) {
-      throw new ForbiddenException('본인 식당의 메뉴만 삭제할 수 있습니다.');
+      throw new ForbiddenException(RESPONSE_MESSAGES.MENU_FORBIDDEN);
     }
 
     await this.menuRepository.softDelete(menuId);

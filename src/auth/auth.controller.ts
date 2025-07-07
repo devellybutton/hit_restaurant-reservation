@@ -46,7 +46,11 @@ export class AuthController {
   @ApiOperation({ summary: '식당 로그인', description: '식당 계정으로 로그인한다.' })
   @ApiBody({ type: RestaurantLoginForm })
   @ApiResponse({ status: 200, description: '로그인 성공', type: LoginResponseDto })
-  @ApiResponse({ status: 401, description: '로그인 실패 (잘못된 로그인 정보)' })
+  @ApiResponse({
+    status: 401,
+    description: '로그인 실패 (잘못된 로그인 정보)',
+    type: ErrorResponseDto,
+  })
   async restaurantLogin(
     @Body() loginForm: RestaurantLoginForm,
   ): Promise<SuccessResponseDto<LoginResponseDto>> {

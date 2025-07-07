@@ -32,10 +32,10 @@ export class DateUtil {
  */
 export class PhoneUtil {
   /**
-   * 전화번호 유효성 검사 (11자리 숫자, 010으로 시작)
+   * 전화번호 유효성 검사 (9~11자리 숫자)
    */
   static isValid(phone: string): boolean {
-    const phoneRegex = /^010\d{8}$/;
+    const phoneRegex = /^\d{9,11}$/;
     return phoneRegex.test(phone);
   }
 }

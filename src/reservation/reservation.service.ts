@@ -2,7 +2,6 @@ import {
   Injectable,
   ForbiddenException,
   NotFoundException,
-  BadRequestException,
   ConflictException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -14,6 +13,7 @@ import { Restaurant } from 'src/entity/restaurant.entity';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { CreateReservationForm, ReservationFilterForm, UpdateReservationForm } from './forms';
 import { ReservationResponseDto } from './dtos';
+import { RESPONSE_MESSAGES } from 'src/util/responses';
 
 /**
  * 예약 서비스
@@ -45,9 +45,6 @@ export class ReservationService {
     const startTime = new Date(createForm.startTime);
     const endTime = new Date(createForm.endTime);
 
-    // 시간 유효성 검증
-    this.validateTimeRange(startTime, endTime);
-
     // 엔티티 존재 확인
     const [customer, restaurant, menus] = await Promise.all([
       this.findCustomerById(user.id),
@@ -72,8 +69,7 @@ export class ReservationService {
     const savedReservation = await this.reservationRepository.save(reservation);
 
     // 관계 데이터와 함께 다시 조회
-    const reservationWithRelations = await this.findReservationWithRelations(savedReservation.id);
-    return this.mapToResponseDto(reservationWithRelations);
+    return this.mapToResponseDto(await this.findReservationWithRelations(savedReservation.id));
   }
 
   /**
@@ -117,7 +113,7 @@ export class ReservationService {
 
     // 본인 예약인지 확인
     if (reservation.customer.id !== user.id) {
-      throw new ForbiddenException('본인이 생성한 예약만 수정할 수 있습니다.');
+      throw new ForbiddenException(RESPONSE_MESSAGES.RESERVATION_FORBIDDEN);
     }
 
     // 인원수 수정
@@ -132,8 +128,7 @@ export class ReservationService {
     }
 
     const updatedReservation = await this.reservationRepository.save(reservation);
-    const reservationWithRelations = await this.findReservationWithRelations(updatedReservation.id);
-    return this.mapToResponseDto(reservationWithRelations);
+    return this.mapToResponseDto(await this.findReservationWithRelations(updatedReservation.id));
   }
 
   /**
@@ -148,42 +143,15 @@ export class ReservationService {
     });
 
     if (!reservation) {
-      throw new NotFoundException('예약을 찾을 수 없습니다.');
+      throw new NotFoundException(RESPONSE_MESSAGES.RESERVATION_NOT_FOUND);
     }
 
     // 본인 예약인지 확인
     if (reservation.customer.id !== user.id) {
-      throw new ForbiddenException('본인이 생성한 예약만 취소할 수 있습니다.');
+      throw new ForbiddenException(RESPONSE_MESSAGES.RESERVATION_FORBIDDEN);
     }
 
     await this.reservationRepository.softDelete(reservationId);
-  }
-
-  /**
-   * 시간 유효성 검증
-   */
-  private validateTimeRange(startTime: Date, endTime: Date): void {
-    const now = new Date();
-
-    if (startTime <= now) {
-      throw new BadRequestException('예약 시간은 현재 시간보다 이후여야 합니다.');
-    }
-
-    if (endTime <= startTime) {
-      throw new BadRequestException('종료 시간은 시작 시간보다 이후여야 합니다.');
-    }
-
-    const timeDifference = endTime.getTime() - startTime.getTime();
-    const minDuration = 30 * 60 * 1000; // 30분
-    const maxDuration = 4 * 60 * 60 * 1000; // 4시간
-
-    if (timeDifference < minDuration) {
-      throw new BadRequestException('예약 시간은 최소 30분 이상이어야 합니다.');
-    }
-
-    if (timeDifference > maxDuration) {
-      throw new BadRequestException('예약 시간은 최대 4시간까지 가능합니다.');
-    }
   }
 
   /**
@@ -212,7 +180,7 @@ export class ReservationService {
     const conflictingReservation = await queryBuilder.getOne();
 
     if (conflictingReservation) {
-      throw new ConflictException('해당 시간에 이미 다른 예약이 있습니다.');
+      throw new ConflictException(RESPONSE_MESSAGES.RESERVATION_CONFLICT);
     }
   }
 
@@ -225,7 +193,7 @@ export class ReservationService {
     });
 
     if (!customer) {
-      throw new NotFoundException('고객 정보를 찾을 수 없습니다.');
+      throw new NotFoundException(RESPONSE_MESSAGES.CUSTOMER_NOT_FOUND);
     }
 
     return customer;
@@ -240,7 +208,7 @@ export class ReservationService {
     });
 
     if (!restaurant) {
-      throw new NotFoundException('식당 정보를 찾을 수 없습니다.');
+      throw new NotFoundException(RESPONSE_MESSAGES.RESTAURANT_NOT_FOUND);
     }
 
     return restaurant;
@@ -250,31 +218,15 @@ export class ReservationService {
    * 메뉴 조회 및 검증
    */
   private async findMenusByIds(menuIds: number[], restaurantId: number): Promise<Menu[]> {
-    const menus = await this.menuRepository.find({
-      where: {
-        id: menuIds.length === 1 ? menuIds[0] : undefined,
-        restaurant: { id: restaurantId },
-      },
-      relations: ['restaurant'],
-    });
-
-    if (menuIds.length > 1) {
-      const foundMenus = await this.menuRepository
-        .createQueryBuilder('menu')
-        .where('menu.id IN (:...menuIds)', { menuIds })
-        .andWhere('menu.restaurant.id = :restaurantId', { restaurantId })
-        .leftJoinAndSelect('menu.restaurant', 'restaurant')
-        .getMany();
-
-      if (foundMenus.length !== menuIds.length) {
-        throw new NotFoundException('일부 메뉴를 찾을 수 없거나 해당 식당의 메뉴가 아닙니다.');
-      }
-
-      return foundMenus;
-    }
+    const menus = await this.menuRepository
+      .createQueryBuilder('menu')
+      .where('menu.id IN (:...menuIds)', { menuIds })
+      .andWhere('menu.restaurant.id = :restaurantId', { restaurantId })
+      .leftJoinAndSelect('menu.restaurant', 'restaurant')
+      .getMany();
 
     if (menus.length !== menuIds.length) {
-      throw new NotFoundException('일부 메뉴를 찾을 수 없거나 해당 식당의 메뉴가 아닙니다.');
+      throw new NotFoundException(RESPONSE_MESSAGES.MENU_NOT_FOUND);
     }
 
     return menus;
@@ -290,7 +242,7 @@ export class ReservationService {
     });
 
     if (!reservation) {
-      throw new NotFoundException('예약을 찾을 수 없습니다.');
+      throw new NotFoundException(RESPONSE_MESSAGES.RESERVATION_NOT_FOUND);
     }
 
     return reservation;

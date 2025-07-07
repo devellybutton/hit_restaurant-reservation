@@ -60,17 +60,17 @@ export class IsValidTimeConstraint implements ValidatorConstraintInterface {
 }
 
 /**
- * 한국 휴대폰번호 형식 검증 (11자리 숫자, 010으로 시작)
+ * 한국 전화번호 형식 검증 (9~11자리 숫자)
  */
-@ValidatorConstraint({ name: 'isKoreanPhone', async: false })
-export class IsKoreanPhoneConstraint implements ValidatorConstraintInterface {
+@ValidatorConstraint({ name: 'isValidPhone', async: false })
+export class IsValidPhoneConstraint implements ValidatorConstraintInterface {
   validate(value: any): boolean {
     if (typeof value !== 'string') return false;
     return PhoneUtil.isValid(value);
   }
 
   defaultMessage(): string {
-    return '전화번호는 010으로 시작하는 11자리 숫자여야 합니다.';
+    return '전화번호는 9~11자리 숫자여야 합니다.';
   }
 }
 
@@ -148,7 +148,7 @@ export function IsKoreanPhone(validationOptions?: ValidationOptions) {
       propertyName: propertyName,
       options: validationOptions,
       constraints: [],
-      validator: IsKoreanPhoneConstraint,
+      validator: IsValidPhoneConstraint,
     });
   };
 }

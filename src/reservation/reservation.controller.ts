@@ -25,6 +25,12 @@ import { ReservationResponseDto } from './dtos';
 import { JwtPayload } from '../auth/dtos';
 import { CustomerAuthGuard } from 'src/auth/guards/customer-auth.guard';
 import { RestaurantAuthGuard } from 'src/auth/guards/restaurant-auth.guard';
+import {
+  SuccessResponseDto,
+  ErrorResponseDto,
+  RESPONSE_MESSAGES,
+  ResponseUtil,
+} from 'src/util/responses';
 
 /**
  * 예약 컨트롤러
@@ -45,68 +51,12 @@ export class ReservationController {
     summary: '예약 생성 (고객용)',
     description: '새로운 예약을 생성한다. 해당 식당의 다른 예약과 시간이 겹치면 안 된다.',
   })
-  @ApiResponse({
-    status: 201,
-    description: '예약 생성 성공',
-    type: ReservationResponseDto,
-    example: {
-      id: 1,
-      guestCount: 4,
-      startTime: '2025-07-07T19:00:00.000Z',
-      endTime: '2025-07-07T21:00:00.000Z',
-      phone: '010-1234-5678',
-      restaurant: {
-        id: 1,
-        name: '맛있는 한식당',
-        phone: '02-1234-5678',
-      },
-      customer: {
-        id: 1,
-        loginId: 'customer01',
-      },
-      menus: [
-        {
-          id: 1,
-          name: '짬뽕',
-          price: 8000,
-          category: '중식',
-        },
-      ],
-      totalAmount: 8000,
-      createdAt: '2025-07-06T18:00:00.000Z',
-      updatedAt: '2025-07-06T18:00:00.000Z',
-    },
-  })
-  @ApiResponse({
-    status: 400,
-    description: '잘못된 요청 - 시간 유효성 검증 실패',
-    example: {
-      statusCode: 400,
-      message: '예약 시간은 현재 시간보다 이후여야 합니다.',
-      error: 'Bad Request',
-    },
-  })
-  @ApiResponse({
-    status: 401,
-    description: '인증 실패',
-  })
-  @ApiResponse({
-    status: 403,
-    description: '권한 없음 - 고객 권한 필요',
-  })
-  @ApiResponse({
-    status: 404,
-    description: '식당 또는 메뉴를 찾을 수 없음',
-  })
-  @ApiResponse({
-    status: 409,
-    description: '시간 겹침 - 해당 시간에 이미 다른 예약이 있음',
-    example: {
-      statusCode: 409,
-      message: '해당 시간에 이미 다른 예약이 있습니다.',
-      error: 'Conflict',
-    },
-  })
+  @ApiResponse({ status: 201, description: '예약 생성 성공', type: SuccessResponseDto })
+  @ApiResponse({ status: 400, description: '잘못된 요청', type: ErrorResponseDto })
+  @ApiResponse({ status: 401, description: '인증 실패', type: ErrorResponseDto })
+  @ApiResponse({ status: 403, description: '고객 권한 필요', type: ErrorResponseDto })
+  @ApiResponse({ status: 404, description: '식당 또는 메뉴 없음', type: ErrorResponseDto })
+  @ApiResponse({ status: 409, description: '예약 시간 중복', type: ErrorResponseDto })
   async createReservation(
     @Request() req: { user: JwtPayload },
     @Body() createForm: CreateReservationForm,
@@ -148,19 +98,9 @@ export class ReservationController {
     description: '포함 메뉴 이름 검색',
     example: '짬뽕',
   })
-  @ApiResponse({
-    status: 200,
-    description: '예약 목록 조회 성공',
-    type: [ReservationResponseDto],
-  })
-  @ApiResponse({
-    status: 401,
-    description: '인증 실패',
-  })
-  @ApiResponse({
-    status: 403,
-    description: '권한 없음 - 고객 권한 필요',
-  })
+  @ApiResponse({ status: 200, description: '조회 성공', type: SuccessResponseDto })
+  @ApiResponse({ status: 401, description: '인증 실패', type: ErrorResponseDto })
+  @ApiResponse({ status: 403, description: '고객 권한 필요', type: ErrorResponseDto })
   async getCustomerReservations(
     @Request() req: { user: JwtPayload },
     @Query() filters: ReservationFilterForm,
@@ -202,53 +142,15 @@ export class ReservationController {
     description: '포함 메뉴 이름 검색',
     example: '짬뽕',
   })
-  @ApiResponse({
-    status: 200,
-    description: '예약 목록 조회 성공',
-    type: [ReservationResponseDto],
-    example: [
-      {
-        id: 1,
-        guestCount: 4,
-        startTime: '2025-07-07T19:00:00.000Z',
-        endTime: '2025-07-07T21:00:00.000Z',
-        phone: '010-1234-5678',
-        restaurant: {
-          id: 1,
-          name: '맛있는 한식당',
-          phone: '02-1234-5678',
-        },
-        customer: {
-          id: 1,
-          loginId: 'customer01',
-        },
-        menus: [
-          {
-            id: 1,
-            name: '짬뽕',
-            price: 8000,
-            category: '중식',
-          },
-        ],
-        totalAmount: 8000,
-        createdAt: '2025-07-06T18:00:00.000Z',
-        updatedAt: '2025-07-06T18:00:00.000Z',
-      },
-    ],
-  })
-  @ApiResponse({
-    status: 401,
-    description: '인증 실패',
-  })
-  @ApiResponse({
-    status: 403,
-    description: '권한 없음 - 식당 권한 필요',
-  })
+  @ApiResponse({ status: 200, description: '조회 성공', type: SuccessResponseDto })
+  @ApiResponse({ status: 401, description: '인증 실패', type: ErrorResponseDto })
+  @ApiResponse({ status: 403, description: '식당 권한 필요', type: ErrorResponseDto })
   async getRestaurantReservations(
     @Request() req: { user: JwtPayload },
     @Query() filters: ReservationFilterForm,
-  ): Promise<ReservationResponseDto[]> {
-    return await this.reservationService.getReservations(req.user, filters);
+  ): Promise<SuccessResponseDto<ReservationResponseDto[]>> {
+    const result = await this.reservationService.getReservations(req.user, filters);
+    return ResponseUtil.created(result, RESPONSE_MESSAGES.RESERVATION_CREATED);
   }
 
   /**
@@ -265,38 +167,18 @@ export class ReservationController {
     description: '수정할 예약 ID',
     example: 1,
   })
-  @ApiResponse({
-    status: 200,
-    description: '예약 수정 성공',
-    type: ReservationResponseDto,
-  })
-  @ApiResponse({
-    status: 400,
-    description: '잘못된 요청',
-  })
-  @ApiResponse({
-    status: 401,
-    description: '인증 실패',
-  })
-  @ApiResponse({
-    status: 403,
-    description: '권한 없음 - 본인 예약만 수정 가능',
-    example: {
-      statusCode: 403,
-      message: '본인이 생성한 예약만 수정할 수 있습니다.',
-      error: 'Forbidden',
-    },
-  })
-  @ApiResponse({
-    status: 404,
-    description: '예약을 찾을 수 없음',
-  })
+  @ApiResponse({ status: 200, description: '수정 성공', type: SuccessResponseDto })
+  @ApiResponse({ status: 400, description: '잘못된 요청', type: ErrorResponseDto })
+  @ApiResponse({ status: 401, description: '인증 실패', type: ErrorResponseDto })
+  @ApiResponse({ status: 403, description: '본인 예약 아님', type: ErrorResponseDto })
+  @ApiResponse({ status: 404, description: '예약 없음', type: ErrorResponseDto })
   async updateReservation(
     @Request() req: { user: JwtPayload },
     @Param('id', ParseIntPipe) id: number,
     @Body() updateForm: UpdateReservationForm,
-  ): Promise<ReservationResponseDto> {
-    return await this.reservationService.updateReservation(req.user, id, updateForm);
+  ): Promise<SuccessResponseDto<ReservationResponseDto>> {
+    const result = await this.reservationService.updateReservation(req.user, id, updateForm);
+    return ResponseUtil.success(result, RESPONSE_MESSAGES.RESERVATION_UPDATED);
   }
 
   /**
@@ -313,39 +195,16 @@ export class ReservationController {
     description: '취소할 예약 ID',
     example: 1,
   })
-  @ApiResponse({
-    status: 200,
-    description: '예약 취소 성공',
-    example: {
-      message: '예약이 성공적으로 취소되었습니다.',
-    },
-  })
-  @ApiResponse({
-    status: 400,
-    description: '잘못된 예약 ID',
-  })
-  @ApiResponse({
-    status: 401,
-    description: '인증 실패',
-  })
-  @ApiResponse({
-    status: 403,
-    description: '권한 없음 - 본인 예약만 취소 가능',
-    example: {
-      statusCode: 403,
-      message: '본인이 생성한 예약만 취소할 수 있습니다.',
-      error: 'Forbidden',
-    },
-  })
-  @ApiResponse({
-    status: 404,
-    description: '예약을 찾을 수 없음',
-  })
+  @ApiResponse({ status: 200, description: '취소 성공', type: SuccessResponseDto })
+  @ApiResponse({ status: 400, description: '잘못된 ID', type: ErrorResponseDto })
+  @ApiResponse({ status: 401, description: '인증 실패', type: ErrorResponseDto })
+  @ApiResponse({ status: 403, description: '본인 예약 아님', type: ErrorResponseDto })
+  @ApiResponse({ status: 404, description: '예약 없음', type: ErrorResponseDto })
   async deleteReservation(
     @Request() req: { user: JwtPayload },
     @Param('id', ParseIntPipe) id: number,
-  ): Promise<{ message: string }> {
+  ): Promise<SuccessResponseDto> {
     await this.reservationService.deleteReservation(req.user, id);
-    return { message: '예약이 성공적으로 취소되었습니다.' };
+    return ResponseUtil.deleted(RESPONSE_MESSAGES.RESERVATION_CANCELLED);
   }
 }
