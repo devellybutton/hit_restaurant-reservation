@@ -4,8 +4,7 @@ dist
 npm-debug.Logs
 
 # 환경 파일
-.env
-.env.*            
+.env        
 
 # 운영체제/에디터 파일
 .DS_Store
