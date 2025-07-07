@@ -1,0 +1,24 @@
+# Node 관련
+node_modules
+dist
+npm-debug.Logs
+
+# 환경 파일
+.env
+.env.*            
+
+# 운영체제/에디터 파일
+.DS_Store
+Thumbs.db
+.idea
+.vscode
+
+# 테스트/문서
+coverage
+test
+*.spec.ts
+docs
+
+# Git
+.git
+.gitignore
