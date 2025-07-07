@@ -9,6 +9,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Customer } from 'src/entity/customer.entity';
 import { Restaurant } from 'src/entity/restaurant.entity';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { CustomerAuthGuard } from './guards/customer-auth.guard';
+import { RestaurantAuthGuard } from './guards/restaurant-auth.guard';
 
 /**
  * 인증 모듈
@@ -25,7 +27,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     TypeOrmModule.forFeature([Customer, Restaurant]),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, JwtStrategy, CustomerAuthGuard, RestaurantAuthGuard],
   exports: [AuthService, JwtStrategy, PassportModule],
 })
 export class AuthModule {}
